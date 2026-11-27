@@ -1,0 +1,37 @@
+name: Build mod zip
+
+# Runs when you push a version tag such as v1.0.1.0 (or create one with a GitHub release).
+# It builds FS25_VehicleSwitchFilter.zip with modDesc.xml at the top level, which is the layout FS25 needs,
+# and attaches it to a GitHub Release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the tag matches the modDesc.xml version
+        run: |
+          V=$(grep -oP '(?<=<version>)[^<]+' modDesc.xml | head -n 1)
+          echo "modDesc.xml version: $V, tag: $GITHUB_REF_NAME"
+          if [ "v$V" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match the modDesc.xml version v$V"
+            exit 1
+          fi
+
+      - name: Zip the mod
+        run: zip -r -X "$RUNNER_TEMP/FS25_VehicleSwitchFilter.zip" . -x ".git/*" ".github/*" ".gitignore" ".gitattributes" "README.md" "*.patch"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # If the release was already created on GitHub's "Draft a new release" page, attach the zip to it instead
+        run: |
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/FS25_VehicleSwitchFilter.zip" --title "$GITHUB_REF_NAME" --generate-notes \
+            || gh release upload "$GITHUB_REF_NAME" "$RUNNER_TEMP/FS25_VehicleSwitchFilter.zip" --clobber
