@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<l10n>
+	<translationContributors></translationContributors>
+	<texts>
+		<text name= "input_TOGGLE_VEHICLE_FILTER"       	text= "Aktive durchschalten (TOGGLE_VEHICLE_FILTER)" />
+		<text name= "KEY_TEXT_DISPLAY"						text= "Aktive durchschalten" />
+		<text name= "warning_noRunningVehicles"				text= "Keine laufenden Fahrzeuge gefunden (Standard-Umschaltung)" />
+		<text name= "warning_motorFilterStatus"				text= "Fahrzeug-Motorfilter: %s" />
+		<text name= "vsf_ui_on"								text= "AN" />
+		<text name= "vsf_ui_off"							text= "AUS" />
+	</texts>
+</l10n>
+
+ 

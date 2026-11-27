@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="108">
+    
+    <author>jhome</author>
+    <version>1.0.0.0</version>
+    <title>
+        <en>Vehicle Switcher Filter</en>
+        <de>Fahrzeug-Umschaltfilter</de>
+        <fr>Filtre De Commutateur De Véhicule</fr>
+    </title>
+    
+    <description>
+<en><![CDATA[
+Vehicle Switcher Filter.        
+A toggle to cycle thru vehicles with (engines running or AI controlled only) vs. default all vehicles, using default switching keys.
+No need to change "switch vehicle" inputs.
+If no vehicles are running or AI driven with toggle on, will still switch vehicles by default (with warning message shown).
+Toggled on or off shows icon next to speedometer display.
+Will exclude AI vehicles from mod- (FS25_WorkingNeighborOnField).
+
+Toggle ON/OFF keys can be adjusted.
+-Switch Thru Active  ("right Alt + keypad 7") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></en>
+<de><![CDATA[
+Fahrzeug-Umschaltfilter.        
+Umschalter: Wechseln zwischen (laufenden Motoren/KI-gesteuert) vs. standardmäßig allen Fahrzeugen über die Standard-Tasten.
+Es ist nicht erforderlich, die Eingaben für den „Fahrzeugwechsel“ zu ändern.
+Falls keine Fahrzeuge aktiv sind oder per KI gesteuert werden, erfolgt standardmäßig dennoch ein Fahrzeugwechsel (unter Anzeige einer Warnmeldung).
+Bei Ein- oder Ausschalten wird ein Symbol neben der Tachoanzeige eingeblendet.
+KI-Fahrzeuge werden vom Mod ausgeschlossen- (FS25_WorkingNeighborOnField).
+
+Die Ein-/Aus-Tasten können angepasst werden.
+-Aktive durchschalten  ("Alt Gr + 7 (Ziffernblock)") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></de>
+<fr><![CDATA[
+Filtre de Commutateur de Véhicule.        
+Une option pour basculer entre les véhicules — en alternant entre « moteurs en marche ou contrôlés par l'IA uniquement » et le mode par défaut « tous les véhicules » — en utilisant les touches de commutation par défaut.
+Pas besoin de modifier les commandes de « changement de véhicule ».
+Si aucun véhicule n'est en mouvement ou piloté par l'IA alors que l'option est activée, le changement de véhicule s'effectuera tout de même par défaut (avec affichage d'un message d'avertissement).
+L'activation ou la désactivation affiche une icône à côté de l'affichage du compteur de vitesse.
+Exclura les véhicules IA du mod- (FS25_WorkingNeighborOnField).
+
+Les touches de basculement ON/OFF peuvent être ajustées.
+-Parcourir les actifs  ("Touche Alt Gr + 7 du pavé numérique") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></fr>
+    </description>
+    
+    <l10n filenamePrefix="translations/translation"/>
+    <iconFilename>icon_switch.dds</iconFilename>
+    <multiplayer supported="true" /> 
+
+    <actions>
+        <action name="TOGGLE_VEHICLE_FILTER"/>
+    </actions>
+
+    <inputBinding>
+        <actionBinding action="TOGGLE_VEHICLE_FILTER">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_ralt KEY_KP_7"/>
+            <binding device="0_XINPUT_GAMEPAD" input="BUTTON_5 BUTTON_6 BUTTON_11"/>
+        </actionBinding>
+    </inputBinding>
+    
+    <extraSourceFiles>
+        <sourceFile filename="VehicleSwitchFilter.lua" />
+        <sourceFile filename="VehicleSwitchEvent.lua" />
+    </extraSourceFiles>
+
+</modDesc>

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<l10n>
+	<translationContributors></translationContributors>
+	<texts>
+		<text name= "input_TOGGLE_VEHICLE_FILTER"        	text= "Switch Thru Active (TOGGLE_VEHICLE_FILTER)" />
+		<text name= "KEY_TEXT_DISPLAY"						text= "Switch Thru Active" />
+		<text name= "warning_noRunningVehicles"				text= "No Running Vehicles Found (Default Switching)" />
+		<text name= "warning_motorFilterStatus"				text= "Vehicle Motor Filter: %s" />
+		<text name= "vsf_ui_on"								text= "ON" />
+		<text name= "vsf_ui_off"							text= "OFF" />
+	</texts>
+</l10n>
+
+ 
