@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<l10n>
+	<translationContributors></translationContributors>
+	<texts>
+		<text name="input_TOGGLE_VEHICLE_FILTER" text="Přepínat mezi aktivními (TOGGLE_VEHICLE_FILTER)" />
+		<text name="KEY_TEXT_DISPLAY" text="Přepínat mezi aktivními" />
+		<text name="warning_noRunningVehicles" text="Nenalezena žádná běžící vozidla (výchozí přepínání)" />
+		<text name="warning_motorFilterStatus" text="Filtr motoru vozidla: %s" />
+		<text name="vsf_ui_on" text="ZAP" />
+		<text name="vsf_ui_off" text="VYP" />
+	</texts>
+</l10n>

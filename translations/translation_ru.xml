@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<l10n>
+	<translationContributors></translationContributors>
+	<texts>
+		<text name="input_TOGGLE_VEHICLE_FILTER" text="Переключение между активными (TOGGLE_VEHICLE_FILTER)" />
+		<text name="KEY_TEXT_DISPLAY" text="Переключение между активными" />
+		<text name="warning_noRunningVehicles" text="Работающая техника не найдена (переключение по умолчанию)" />
+		<text name="warning_motorFilterStatus" text="Фильтр двигателя техники: %s" />
+		<text name="vsf_ui_on" text="ВКЛ" />
+		<text name="vsf_ui_off" text="ВЫКЛ" />
+	</texts>
+</l10n>

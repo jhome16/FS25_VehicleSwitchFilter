@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<l10n>
+	<translationContributors></translationContributors>
+	<texts>
+		<text name="input_TOGGLE_VEHICLE_FILTER" text="Aktifler Arasında Geçiş (TOGGLE_VEHICLE_FILTER)" />
+		<text name="KEY_TEXT_DISPLAY" text="Aktifler Arasında Geçiş" />
+		<text name="warning_noRunningVehicles" text="Çalışan araç bulunamadı (varsayılan geçiş)" />
+		<text name="warning_motorFilterStatus" text="Araç motor filtresi: %s" />
+		<text name="vsf_ui_on" text="AÇIK" />
+		<text name="vsf_ui_off" text="KAPALI" />
+	</texts>
+</l10n>

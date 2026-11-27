@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<l10n>
+	<translationContributors></translationContributors>
+	<texts>
+		<text name="input_TOGGLE_VEHICLE_FILTER" text="Alternar entre ativos (TOGGLE_VEHICLE_FILTER)" />
+		<text name="KEY_TEXT_DISPLAY" text="Alternar entre ativos" />
+		<text name="warning_noRunningVehicles" text="Nenhum veículo ligado encontrado (troca padrão)" />
+		<text name="warning_motorFilterStatus" text="Filtro de motor do veículo: %s" />
+		<text name="vsf_ui_on" text="LIGADO" />
+		<text name="vsf_ui_off" text="DESLIGADO" />
+	</texts>
+</l10n>

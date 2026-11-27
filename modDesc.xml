@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="108">
+<modDesc descVersion="116">
     
     <author>jhome</author>
-    <version>1.0.0.0</version>
+    <version>1.0.1.0</version>
     <title>
         <en>Vehicle Switcher Filter</en>
         <de>Fahrzeug-Umschaltfilter</de>
         <fr>Filtre De Commutateur De Véhicule</fr>
+        <es>Filtro de Cambio de Vehículo</es>
+        <it>Filtro Cambio Veicolo</it>
+        <pl>Filtr Przełączania Pojazdów</pl>
+        <cz>Filtr Přepínání Vozidel</cz>
+        <ru>Фильтр Переключения Техники</ru>
+        <br>Filtro de Troca de Veículo</br>
+        <nl>Voertuigwisselfilter</nl>
+        <tr>Araç Değiştirme Filtresi</tr>
     </title>
     
     <description>
@@ -43,6 +51,94 @@ Exclura les véhicules IA du mod- (FS25_WorkingNeighborOnField).
 Les touches de basculement ON/OFF peuvent être ajustées.
 -Parcourir les actifs  ("Touche Alt Gr + 7 du pavé numérique") ("BUTTON_5 BUTTON_6 BUTTON_11")
 ]]></fr>
+<es><![CDATA[
+Filtro de cambio de vehículo.        
+Un interruptor para recorrer los vehículos (solo con el motor en marcha o controlados por la IA) en lugar de todos los vehículos por defecto, usando las teclas de cambio habituales.
+No es necesario cambiar los controles de «cambiar de vehículo».
+Si no hay vehículos en marcha ni controlados por la IA con el interruptor activado, se cambiará de vehículo igualmente por defecto (con un mensaje de aviso).
+Al activarlo o desactivarlo se muestra un icono junto al velocímetro.
+Excluye los vehículos de IA del mod- (FS25_WorkingNeighborOnField).
+
+Las teclas para activar/desactivar se pueden cambiar.
+-Cambiar entre activos  ("Alt derecha + 7 del teclado numérico") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></es>
+<it><![CDATA[
+Filtro cambio veicolo.        
+Un interruttore per scorrere i veicoli (solo con motore acceso o controllati dall'IA) invece di tutti i veicoli predefiniti, usando i normali tasti di cambio.
+Non serve modificare i comandi di «cambio veicolo».
+Se con l'interruttore attivo nessun veicolo è acceso o guidato dall'IA, il cambio veicolo avviene comunque in modo predefinito (con un messaggio di avviso).
+Quando è attivato o disattivato, viene mostrata un'icona accanto al tachimetro.
+Esclude i veicoli IA del mod- (FS25_WorkingNeighborOnField).
+
+I tasti per attivare/disattivare possono essere modificati.
+-Passa tra i veicoli attivi  ("Alt destro + 7 del tastierino numerico") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></it>
+<pl><![CDATA[
+Filtr przełączania pojazdów.        
+Przełącznik pozwalający przechodzić tylko między pojazdami z włączonym silnikiem lub sterowanymi przez SI, zamiast między wszystkimi pojazdami, przy użyciu standardowych klawiszy zmiany pojazdu.
+Nie trzeba zmieniać ustawień klawiszy „zmień pojazd”.
+Jeśli przy włączonym przełączniku żaden pojazd nie jest uruchomiony ani prowadzony przez SI, pojazdy nadal będą przełączane domyślnie (z komunikatem ostrzegawczym).
+Włączenie lub wyłączenie pokazuje ikonę obok prędkościomierza.
+Wyklucza pojazdy SI z moda- (FS25_WorkingNeighborOnField).
+
+Klawisze włączania/wyłączania można zmienić.
+-Przełączaj aktywne  ("prawy Alt + 7 na klawiaturze numerycznej") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></pl>
+<cz><![CDATA[
+Filtr přepínání vozidel.        
+Přepínač, který umožňuje procházet jen vozidla se spuštěným motorem nebo řízená AI místo všech vozidel, pomocí výchozích kláves pro přepínání.
+Není třeba měnit ovládání „přepnout vozidlo“.
+Pokud při zapnutém přepínači není spuštěné ani AI řízené žádné vozidlo, vozidla se stále přepínají výchozím způsobem (se zobrazeným varováním).
+Zapnutí nebo vypnutí zobrazí ikonu vedle tachometru.
+Vylučuje AI vozidla z modu- (FS25_WorkingNeighborOnField).
+
+Klávesy pro zapnutí/vypnutí lze změnit.
+-Přepínat mezi aktivními  ("pravý Alt + 7 na numerické klávesnici") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></cz>
+<ru><![CDATA[
+Фильтр переключения техники.        
+Переключатель, позволяющий выбирать только технику с работающим двигателем или под управлением ИИ вместо всей техники по умолчанию, с помощью стандартных клавиш переключения.
+Менять назначение клавиш «сменить технику» не нужно.
+Если при включённом переключателе нет техники с работающим двигателем или под управлением ИИ, техника всё равно будет переключаться по умолчанию (с показом предупреждения).
+При включении или выключении рядом со спидометром показывается значок.
+Исключает технику ИИ из мода- (FS25_WorkingNeighborOnField).
+
+Клавиши включения/выключения можно изменить.
+-Переключение между активными  ("правый Alt + 7 на цифровой клавиатуре") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></ru>
+<br><![CDATA[
+Filtro de troca de veículo.        
+Um botão para alternar apenas entre veículos com o motor ligado ou controlados pela IA, em vez de todos os veículos por padrão, usando as teclas de troca padrão.
+Não é preciso alterar os comandos de «trocar de veículo».
+Se nenhum veículo estiver ligado ou controlado pela IA com o botão ativado, a troca de veículo continuará a funcionar por padrão (com uma mensagem de aviso).
+Ao ligar ou desligar, um ícone é mostrado ao lado do velocímetro.
+Exclui os veículos de IA do mod- (FS25_WorkingNeighborOnField).
+
+As teclas para ligar/desligar podem ser ajustadas.
+-Alternar entre ativos  ("Alt direito + 7 do teclado numérico") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></br>
+<nl><![CDATA[
+Voertuigwisselfilter.        
+Een schakelaar om alleen te wisselen tussen voertuigen met draaiende motor of door AI bestuurd, in plaats van alle voertuigen, met de standaard wisseltoetsen.
+De invoer voor „voertuig wisselen” hoeft niet te worden aangepast.
+Als er bij ingeschakelde schakelaar geen voertuigen draaien of door AI worden bestuurd, wordt toch standaard van voertuig gewisseld (met een waarschuwing).
+Bij in- of uitschakelen wordt een pictogram naast de snelheidsmeter getoond.
+Sluit AI-voertuigen van de mod uit- (FS25_WorkingNeighborOnField).
+
+De toetsen voor aan/uit kunnen worden aangepast.
+-Doorschakelen tussen actieve  ("rechter Alt + 7 op het numerieke toetsenbord") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></nl>
+<tr><![CDATA[
+Araç değiştirme filtresi.        
+Varsayılan olarak tüm araçlar yerine yalnızca motoru çalışan veya yapay zekâ tarafından kullanılan araçlar arasında, varsayılan geçiş tuşlarıyla geçiş yapmanızı sağlayan bir anahtar.
+«Araç değiştir» girişlerini değiştirmeniz gerekmez.
+Anahtar açıkken çalışan veya yapay zekâ tarafından sürülen araç yoksa, araç değiştirme yine varsayılan olarak çalışır (bir uyarı mesajıyla).
+Açıldığında veya kapatıldığında hız göstergesinin yanında bir simge gösterilir.
+Yapay zekâ araçlarını moddan hariç tutar- (FS25_WorkingNeighborOnField).
+
+Açma/kapatma tuşları ayarlanabilir.
+-Aktifler Arasında Geçiş  ("sağ Alt + sayısal tuş takımında 7") ("BUTTON_5 BUTTON_6 BUTTON_11")
+]]></tr>
     </description>
     
     <l10n filenamePrefix="translations/translation"/>

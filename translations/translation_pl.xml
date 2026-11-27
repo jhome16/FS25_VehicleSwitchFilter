@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<l10n>
+	<translationContributors></translationContributors>
+	<texts>
+		<text name="input_TOGGLE_VEHICLE_FILTER" text="Przełączaj aktywne (TOGGLE_VEHICLE_FILTER)" />
+		<text name="KEY_TEXT_DISPLAY" text="Przełączaj aktywne" />
+		<text name="warning_noRunningVehicles" text="Nie znaleziono pracujących pojazdów (przełączanie domyślne)" />
+		<text name="warning_motorFilterStatus" text="Filtr silnika pojazdu: %s" />
+		<text name="vsf_ui_on" text="WŁ." />
+		<text name="vsf_ui_off" text="WYŁ." />
+	</texts>
+</l10n>

@@ -23,59 +23,55 @@ local function dbg(msg)
     end
 end
 
+-- safe owner/farm id fetch
+local function getOwnerFarmIdSafe(v)
+    if v == nil then return nil end
+    if v.ownerFarmId ~= nil then return v.ownerFarmId end
+    if v.farmId ~= nil then return v.farmId end
+    if v.getOwnerFarmId ~= nil then
+        return v:getOwnerFarmId()
+    end
+    return nil
+end
+
+-- determine local player's farm id (defensive)
+local function getLocalPlayerFarmId()
+    if g_currentMission == nil then return nil end
+    if g_currentMission.player ~= nil and g_currentMission.player.farmId ~= nil then
+        return g_currentMission.player.farmId
+    end
+    if g_localPlayer ~= nil and g_localPlayer.farmId ~= nil then
+        return g_localPlayer.farmId
+    end
+    if g_currentMission.getFarmId ~= nil then
+        return g_currentMission:getFarmId()
+    end
+    return nil
+end
+
 -- THE RIGID VALIDATOR
 function VehicleSwitchFilter:isVehicleValid(veh)
     if veh == nil or veh.isDeleted then return false end
     if veh.spec_locomotive ~= nil then
         if not g_gameSettings:getValue("switcherTrain") then return false end
     end
-	
-	-- EXCLUDE AI WORKERS FROM "FS25_WorkingNeighborOnField"
-	--local okName, name = pcall(function() return (veh.getFullName and veh:getFullName()) or "" end)
-	--name = (okName and tostring(name):lower()) or ""
-	--if name:find("%(ai worker%s+neighbou?r") then return false end
-	
-	-- safe name fetch
-	local okName, name = pcall(function() return (veh.getFullName and veh:getFullName()) or "" end)
-	name = (okName and tostring(name):lower()) or ""
 
-	-- safe owner/farm id fetch
-	local function getOwnerFarmIdSafe(v)
-		if v == nil then return nil end
-		if v.ownerFarmId ~= nil then return v.ownerFarmId end
-		if v.farmId ~= nil then return v.farmId end
-		if v.getOwnerFarmId ~= nil then
-			local ok, fid = pcall(v.getOwnerFarmId, v)
-			if ok then return fid end
-		end
-		return nil
-	end
+    -- EXCLUDE AI WORKERS FROM "FS25_WorkingNeighborOnField":
+    -- precise neighbour exclusion = name pattern + an owner farm that is not the player's
+    local name = ""
+    if veh.getFullName ~= nil then
+        name = tostring(veh:getFullName() or ""):lower()
+    end
 
-	-- determine local player's farm id (defensive)
-	local function getLocalPlayerFarmId()
-		if g_currentMission == nil then return nil end
-		if g_currentMission.player ~= nil and g_currentMission.player.farmId ~= nil then
-			return g_currentMission.player.farmId
-		end
-		if g_localPlayer ~= nil and g_localPlayer.farmId ~= nil then
-			return g_localPlayer.farmId
-		end
-		if g_currentMission.getFarmId ~= nil then
-			local ok, fid = pcall(g_currentMission.getFarmId, g_currentMission)
-			if ok then return fid end
-		end
-		return nil
-	end
-
-	-- precise neighbour exclusion: name pattern + different owner farm
-	local ownerFarmId = getOwnerFarmIdSafe(veh)
-	local localFarmId = getLocalPlayerFarmId()
-	local isNeighbourName = name:find("%(ai worker%s+neighbou?r")
-	if isNeighbourName and ownerFarmId ~= nil and localFarmId ~= nil and ownerFarmId ~= localFarmId then
-		-- This is a neighbour's AI worker (not owned by the player) -> exclude
-		return false
-	end
-
+    local isNeighbourName = name:find("%(ai worker%s+neighbou?r")
+    if isNeighbourName then
+        local ownerFarmId = getOwnerFarmIdSafe(veh)
+        local localFarmId = getLocalPlayerFarmId()
+        if ownerFarmId ~= nil and localFarmId ~= nil and ownerFarmId ~= localFarmId then
+            -- This is a neighbour's AI worker (not owned by the player) -> exclude
+            return false
+        end
+    end
 
     local isRunning = (veh.getIsMotorStarted ~= nil and veh:getIsMotorStarted())
     local isAI = (veh.getIsAIActive ~= nil and veh:getIsAIActive())
@@ -246,7 +242,7 @@ function VehicleSwitchFilter:_renderStatusAt(posX, posY, size)
         setTextBold(false)
     else
         -- Text rendering (fallback)
-        local statusText = self.enabled and "VSF:ON" or "VSF:OFF"
+        local statusText = "VSF:" .. (self.enabled and g_i18n:getText("vsf_ui_on") or g_i18n:getText("vsf_ui_off"))
         local r,g,b = self.enabled and 0.1 or 0.75, self.enabled and 1 or 0.75, 0.75
 
         setTextColor(r,g,b,1)
@@ -268,29 +264,24 @@ local function tryAppendToSpeedMeter()
         local hud = (g_currentMission.inGameMenu and g_currentMission.inGameMenu.hud) or g_currentMission.hud
         if hud ~= nil and hud.speedMeter ~= nil and hud.speedMeter.draw ~= nil and Utils ~= nil and Utils.appendedFunction ~= nil then
             hud.speedMeter.draw = Utils.appendedFunction(hud.speedMeter.draw, function(self)
-                -- Defensive wrapper: avoid calling engine functions with invalid objects
-                local ok, err = pcall(function()
-					if self.getIsVisible ~= nil and not self:getIsVisible() then
-						return
-					end
-                    if self == nil or self == 0 then
-                        if VehicleSwitchFilter.debugEnabled then dbg("VSF: hud.speedMeter instance invalid in appended draw") end
-                        return
-                    end
-
-                    -- One-line tuned posX/posY (uses hud.speedMeter.x, speedTextOffsetX, speedGaugeCenterOffsetY, speedTextOffsetY)
-                    local posX = (type(self.x) == "number" and (self.x + (self.speedTextOffsetX or 0) + (VehicleSwitchFilter.posNudgeX))) or (g_screenWidth - 0.12)
-					local posY = (type(self.speedGaugeCenterOffsetY) == "number" and (self.speedGaugeCenterOffsetY + (self.speedTextOffsetY or 0) + (VehicleSwitchFilter.posNudgeY))) or 0.12
-                    local size = 0.012 * (g_gameSettings and g_gameSettings.uiScale or 1)
-
-                    VehicleSwitchFilter:_renderStatusAt(posX, posY, size)
-                end)
-                if not ok then
-                    dbg("VSF_ERROR: appended hud.speedMeter.draw pcall failed: " .. tostring(err))
+                -- Defensive checks: avoid calling engine functions with invalid objects
+                if self == nil or self == 0 then
+                    dbg("VSF: hud.speedMeter instance invalid in appended draw")
+                    return
                 end
+                if self.getIsVisible ~= nil and not self:getIsVisible() then
+                    return
+                end
+
+                -- One-line tuned posX/posY (uses hud.speedMeter.x, speedTextOffsetX, speedGaugeCenterOffsetY, speedTextOffsetY)
+                local posX = (type(self.x) == "number" and (self.x + (self.speedTextOffsetX or 0) + (VehicleSwitchFilter.posNudgeX))) or (g_screenWidth - 0.12)
+                local posY = (type(self.speedGaugeCenterOffsetY) == "number" and (self.speedGaugeCenterOffsetY + (self.speedTextOffsetY or 0) + (VehicleSwitchFilter.posNudgeY))) or 0.12
+                local size = 0.012 * (g_gameSettings and g_gameSettings.uiScale or 1)
+
+                VehicleSwitchFilter:_renderStatusAt(posX, posY, size)
             end)
             VehicleSwitchFilter._vsf_appended = true
-            if VehicleSwitchFilter.debugEnabled then dbg("VSF: Appended to hud.speedMeter.draw (instance)") end
+            dbg("VSF: Appended to hud.speedMeter.draw (instance)")
             return true
         end
     end
@@ -298,24 +289,19 @@ local function tryAppendToSpeedMeter()
     -- 2) Fallback: try global SpeedMeterDisplay class (older approach)
     if SpeedMeterDisplay ~= nil and SpeedMeterDisplay.draw ~= nil and Utils ~= nil and Utils.appendedFunction ~= nil then
         SpeedMeterDisplay.draw = Utils.appendedFunction(SpeedMeterDisplay.draw, function(self)
-            local ok, err = pcall(function()
-                if self == nil or self == 0 then
-                    if VehicleSwitchFilter.debugEnabled then dbg("VSF: SpeedMeterDisplay instance invalid in appended draw") end
-                    return
-                end
-
-                local posX = (type(self.gaugeCenterX) == "number" and self.gaugeCenterX) or (g_screenWidth - 0.12)
-                local posY = (type(self.gaugeCenterY) == "number" and (self.gaugeCenterY - (self.speedIndicatorRadiusY or 60) * 0.9)) or 0.12
-                local size = 0.013 * (g_gameSettings and g_gameSettings.uiScale or 1)
-
-                VehicleSwitchFilter:_renderStatusAt(posX, posY, size)
-            end)
-            if not ok then
-                dbg("VSF_ERROR: appended SpeedMeterDisplay.draw pcall failed: " .. tostring(err))
+            if self == nil or self == 0 then
+                dbg("VSF: SpeedMeterDisplay instance invalid in appended draw")
+                return
             end
+
+            local posX = (type(self.gaugeCenterX) == "number" and self.gaugeCenterX) or (g_screenWidth - 0.12)
+            local posY = (type(self.gaugeCenterY) == "number" and (self.gaugeCenterY - (self.speedIndicatorRadiusY or 60) * 0.9)) or 0.12
+            local size = 0.013 * (g_gameSettings and g_gameSettings.uiScale or 1)
+
+            VehicleSwitchFilter:_renderStatusAt(posX, posY, size)
         end)
         VehicleSwitchFilter._vsf_appended = true
-        if VehicleSwitchFilter.debugEnabled then dbg("VSF: Appended to SpeedMeterDisplay.draw (global)") end
+        dbg("VSF: Appended to SpeedMeterDisplay.draw (global)")
         return true
     end
 
@@ -494,41 +480,65 @@ local function _vsf_printField(name, value)
     end
 end
 
+-- Developer helpers (console commands). They only print to the log.
+local function getVehicleName(v)
+    if v.getFullName ~= nil then
+        return tostring(v:getFullName() or "")
+    end
+    return ""
+end
+
+-- Calls fn(index, vehicle, name) for every enterable whose name mentions a neighbour
+local function forEachNeighbourVehicle(tag, fn)
+    if g_currentMission == nil or g_currentMission.vehicleSystem == nil then
+        print(tag .. ": no mission or vehicleSystem")
+        return
+    end
+    local enterables = g_currentMission.vehicleSystem.enterables or {}
+    for i, v in ipairs(enterables) do
+        local name = getVehicleName(v)
+        if name:lower():find("neigh") ~= nil then
+            fn(i, v, name)
+        end
+    end
+end
+
+-- Prints the simple values of a table, and only the type of everything else
+local function printSimpleFields(prefix, tbl, limit)
+    local count = 0
+    for k, val in pairs(tbl) do
+        count = count + 1
+        local t = type(val)
+        if t == "number" or t == "string" or t == "boolean" then
+            print(("    %s.%s = %s"):format(prefix, tostring(k), tostring(val)))
+        else
+            print(("    %s.%s = <%s>"):format(prefix, tostring(k), t))
+        end
+        if limit ~= nil and count >= limit then break end
+    end
+end
+
 -- Temporary neighbor-worker field dumper (call with console command "vsfDumpNeighbors")
 function VehicleSwitchFilter.dumpNeighborFields()
-    pcall(function()
-        if g_currentMission == nil or g_currentMission.vehicleSystem == nil then
-            print("VSF_DUMP: no mission or vehicleSystem")
-            return
+    forEachNeighbourVehicle("VSF_DUMP", function(i, v, name)
+        print(("VSF_DUMP: Index=%d Name=%s"):format(i, name))
+        print("  typeName=" .. tostring(v.typeName))
+        print("  configFileName=" .. tostring(v.configFileName))
+        local keys = {
+            "spec_aiWorker","spec_fieldWorker","spec_neighborFieldWorker","spec_neighbourFieldWorker",
+            "isFieldWorker","isWorker","isNeighborFieldWorker","isNeighbourFieldWorker",
+            "aiTrafficDriver","aiDriver","spec_aiVehicle"
+        }
+        for _, k in ipairs(keys) do
+            print(("  %s = %s"):format(k, tostring(v[k])))
         end
-
-        local enterables = g_currentMission.vehicleSystem.enterables or {}
-        for i, v in ipairs(enterables) do
-            local okName, name = pcall(function() return (v.getFullName and v:getFullName()) or "" end)
-            name = (okName and tostring(name)) or "<error>"
-            local lname = name:lower()
-            if lname:find("neigh") or lname:find("neighbor") or lname:find("neighbour") then
-                print(("VSF_DUMP: Index=%d Name=%s"):format(i, name))
-                print("  typeName=" .. tostring(v.typeName))
-                print("  configFileName=" .. tostring(v.configFileName))
-                local keys = {
-                    "spec_aiWorker","spec_fieldWorker","spec_neighborFieldWorker","spec_neighbourFieldWorker",
-                    "isFieldWorker","isWorker","isNeighborFieldWorker","isNeighbourFieldWorker",
-                    "aiTrafficDriver","aiDriver","spec_aiVehicle"
-                }
-                for _, k in ipairs(keys) do
-                    local ok, val = pcall(function() return v[k] end)
-                    print(("  %s = %s"):format(k, tostring(ok and val or "<error>")))
-                end
-                local count = 0
-                for fk, fv in pairs(v) do
-                    if count >= 30 then break end
-                    print(("  FIELD: %s  (type=%s)"):format(tostring(fk), type(fv)))
-                    count = count + 1
-                end
-                print("----")
-            end
+        local count = 0
+        for fk, fv in pairs(v) do
+            if count >= 30 then break end
+            print(("  FIELD: %s  (type=%s)"):format(tostring(fk), type(fv)))
+            count = count + 1
         end
+        print("----")
     end)
 end
 
@@ -536,146 +546,93 @@ addConsoleCommand("vsfDumpNeighbors", "Dump neighbor worker fields", "dumpNeighb
 
 -- VSF deep dump for neighbor vs Courseplay detection
 function VehicleSwitchFilter.deepDump()
-	pcall(function()
-		if g_currentMission == nil or g_currentMission.vehicleSystem == nil then
-			print("VSF_DEEP: no mission or vehicleSystem")
-			return
-		end
+    forEachNeighbourVehicle("VSF_DEEP", function(i, v, name)
+        print(("VSF_DEEP: Index=%d Name=%s"):format(i, name))
+        -- basic metadata
+        print("  typeName=" .. tostring(v.typeName))
+        print("  configFileName=" .. tostring(v.configFileName))
+        -- farm/owner info
+        local farmId = getOwnerFarmIdSafe(v)
+        print(("  owner/farm id = %s"):format(tostring(farmId)))
+        -- isAI / isRunning
+        local isAI = v.getIsAIActive ~= nil and v:getIsAIActive()
+        local isRun = v.getIsMotorStarted ~= nil and v:getIsMotorStarted()
+        print(("  isAI=%s isRunning=%s"):format(tostring(isAI), tostring(isRun)))
 
-		local enterables = g_currentMission.vehicleSystem.enterables or {}
-		for i, v in ipairs(enterables) do
-			local okName, name = pcall(function() return (v.getFullName and v:getFullName()) or "" end)
-			name = (okName and tostring(name)) or "<error>"
-			local lname = name:lower()
-			if lname:find("neigh") or lname:find("neighbor") or lname:find("neighbour") then
-				print(("VSF_DEEP: Index=%d Name=%s"):format(i, name))
-				-- basic metadata
-				print("  typeName=" .. tostring(v.typeName))
-				print("  configFileName=" .. tostring(v.configFileName))
-				-- farm/owner info
-				local okFarm, farmId = pcall(function()
-					return v.ownerFarmId or v.farmId or (v.getOwnerFarmId and v:getOwnerFarmId())
-				end)
-				print(("  owner/farm id = %s"):format(tostring(okFarm and farmId or "<error>")))
-				-- isAI / isRunning
-				local okAI, isAI = pcall(function() return v.getIsAIActive and v:getIsAIActive() end)
-				local okRun, isRun = pcall(function() return v.getIsMotorStarted and v:getIsMotorStarted() end)
-				print(("  isAI=%s isRunning=%s"):format(tostring(okAI and isAI or "<error>"), tostring(okRun and isRun or "<error>")))
+        -- spec_cpAIImplement details (if present)
+        if v.spec_cpAIImplement ~= nil then
+            print("  spec_cpAIImplement present; dumping keys:")
+            printSimpleFields("cp", v.spec_cpAIImplement)
+        else
+            print("  spec_cpAIImplement = nil")
+        end
 
-				-- spec_cpAIImplement details (if present)
-				if v.spec_cpAIImplement ~= nil then
-					print("  spec_cpAIImplement present; dumping keys:")
-					for k, val in pairs(v.spec_cpAIImplement) do
-						local t = type(val)
-						if t == "number" or t == "string" or t == "boolean" then
-							print(("    cp.%s = %s"):format(tostring(k), tostring(val)))
-						else
-							print(("    cp.%s = <%s>"):format(tostring(k), t))
-						end
-					end
-				else
-					print("  spec_cpAIImplement = nil")
-				end
+        -- spec_aiVehicle details (if present)
+        if v.spec_aiVehicle ~= nil then
+            print("  spec_aiVehicle present; dumping keys:")
+            printSimpleFields("ai", v.spec_aiVehicle)
+        else
+            print("  spec_aiVehicle = nil")
+        end
 
-				-- spec_aiVehicle details (if present)
-				if v.spec_aiVehicle ~= nil then
-					print("  spec_aiVehicle present; dumping keys:")
-					for k, val in pairs(v.spec_aiVehicle) do
-						local t = type(val)
-						if t == "number" or t == "string" or t == "boolean" then
-							print(("    ai.%s = %s"):format(tostring(k), tostring(val)))
-						else
-							print(("    ai.%s = <%s>"):format(tostring(k), t))
-						end
-					end
-				else
-					print("  spec_aiVehicle = nil")
-				end
+        -- eventListeners length and first few names
+        if v.eventListeners ~= nil then
+            local cnt = 0
+            for _ in pairs(v.eventListeners) do cnt = cnt + 1 end
+            print(("  eventListeners count = %d"):format(cnt))
+            local c = 0
+            for k, _ in pairs(v.eventListeners) do
+                if c >= 8 then break end
+                print(("    eventListener: %s"):format(tostring(k)))
+                c = c + 1
+            end
+        else
+            print("  eventListeners = nil")
+        end
 
-				-- eventListeners length and first few names
-				if v.eventListeners ~= nil then
-					local cnt = 0
-					for _ in pairs(v.eventListeners) do cnt = cnt + 1 end
-					print(("  eventListeners count = %d"):format(cnt))
-					local c = 0
-					for k, _ in pairs(v.eventListeners) do
-						if c >= 8 then break end
-						print(("    eventListener: %s"):format(tostring(k)))
-						c = c + 1
-					end
-				else
-					print("  eventListeners = nil")
-				end
-
-				-- print up to 40 top-level fields (name and type) for manual inspection
-				local count = 0
-				for fk, fv in pairs(v) do
-					if count >= 40 then break end
-					print(("  FIELD: %s  (type=%s)"):format(tostring(fk), type(fv)))
-					count = count + 1
-				end
-				print("----")
-			end
-		end
-	end)
+        -- print up to 40 top-level fields (name and type) for manual inspection
+        local count = 0
+        for fk, fv in pairs(v) do
+            if count >= 40 then break end
+            print(("  FIELD: %s  (type=%s)"):format(tostring(fk), type(fv)))
+            count = count + 1
+        end
+        print("----")
+    end)
 end
 
 addConsoleCommand("vsfDeepDump", "Deep Dump neighbor/courseplay", "deepDump", VehicleSwitchFilter)
 
 -- VSF_DEEP2: print specializationsByName keys and spec_cpAIImplement contents for neighbour-named enterables
 function VehicleSwitchFilter.deepDump2()
-	pcall(function()
-		if g_currentMission == nil or g_currentMission.vehicleSystem == nil then
-			print("VSF_DEEP2: no mission or vehicleSystem")
-			return
-		end
+    forEachNeighbourVehicle("VSF_DEEP2", function(i, v, name)
+        print(("VSF_DEEP2: Index=%d Name=%s"):format(i, name))
+        -- specializationsByName keys
+        if v.specializationsByName ~= nil then
+            print("  specializationsByName keys:")
+            for k, _ in pairs(v.specializationsByName) do
+                print("    - " .. tostring(k))
+            end
+        else
+            print("  specializationsByName = nil")
+        end
 
-		local enterables = g_currentMission.vehicleSystem.enterables or {}
-		for i, v in ipairs(enterables) do
-			local okName, name = pcall(function() return (v.getFullName and v:getFullName()) or "" end)
-			name = (okName and tostring(name)) or "<error>"
-			local lname = name:lower()
-			if lname:find("neigh") or lname:find("neighbor") or lname:find("neighbour") then
-				print(("VSF_DEEP2: Index=%d Name=%s"):format(i, name))
-				-- specializationsByName keys
-				if v.specializationsByName ~= nil then
-					print("  specializationsByName keys:")
-					for k,_ in pairs(v.specializationsByName) do
-						print("    - " .. tostring(k))
-					end
-				else
-					print("  specializationsByName = nil")
-				end
+        -- spec_cpAIImplement full shallow dump
+        if v.spec_cpAIImplement ~= nil then
+            print("  spec_cpAIImplement keys/values:")
+            printSimpleFields("cp", v.spec_cpAIImplement, 60)
+        else
+            print("  spec_cpAIImplement = nil")
+        end
 
-				-- spec_cpAIImplement full shallow dump
-				if v.spec_cpAIImplement ~= nil then
-					print("  spec_cpAIImplement keys/values:")
-					local c = 0
-					for k,val in pairs(v.spec_cpAIImplement) do
-						c = c + 1
-						local t = type(val)
-						if t == "number" or t == "string" or t == "boolean" then
-							print(("    cp.%s = %s"):format(tostring(k), tostring(val)))
-						else
-							print(("    cp.%s = <%s>"):format(tostring(k), t))
-						end	
-						if c >= 60 then break end
-					end
-				else
-					print("  spec_cpAIImplement = nil")
-				end
+        -- also print any mod-specific-looking fields at top-level
+        local candidates = {"isNeighbourFieldWorker","isNeighborFieldWorker","neighbourId","neighborId","neighbourName","neighborName"}
+        for _, key in ipairs(candidates) do
+            print(("  %s = %s"):format(key, tostring(v[key])))
+        end
 
-				-- also print any mod-specific-looking fields at top-level
-				local candidates = {"isNeighbourFieldWorker","isNeighborFieldWorker","neighbourId","neighborId","neighbourName","neighborName"}
-				for _, key in ipairs(candidates) do
-					local ok, val = pcall(function() return v[key] end)
-					print(("  %s = %s"):format(key, tostring(ok and val or "<error>")))
-				end
-
-				print("----")
-			end
-		end
-	end)
+        print("----")
+    end)
 end
 
 addConsoleCommand("vsfDeepDump2", "Deep Dump2 neighbor/courseplay", "deepDump2", VehicleSwitchFilter)

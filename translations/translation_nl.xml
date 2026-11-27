@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<l10n>
+	<translationContributors></translationContributors>
+	<texts>
+		<text name="input_TOGGLE_VEHICLE_FILTER" text="Doorschakelen tussen actieve (TOGGLE_VEHICLE_FILTER)" />
+		<text name="KEY_TEXT_DISPLAY" text="Doorschakelen tussen actieve" />
+		<text name="warning_noRunningVehicles" text="Geen draaiende voertuigen gevonden (standaard wisselen)" />
+		<text name="warning_motorFilterStatus" text="Motorfilter voertuig: %s" />
+		<text name="vsf_ui_on" text="AAN" />
+		<text name="vsf_ui_off" text="UIT" />
+	</texts>
+</l10n>
